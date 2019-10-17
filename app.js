@@ -17,8 +17,11 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+//静态资源
 app.use(express.static(path.join(__dirname, 'public')));
 
+//  下载路径
+app.use('/upload',express.static('upload'));
 
 //一级路由接口
 app.use('/', indexRouter);
