@@ -151,5 +151,45 @@ Router.post('/edituser',function (req,res) {
     });
 })
 
+//删除用户
+Router.get('/deluser',function (req,res) {
+    var id =req.query.id;
+    DB.find('user',{'_id':DB.ObjectID(id)},function (err,data) {
+        if(!err){
+            console.log('./'+data[0].avatar);
+            fs.unlink('./'+data[0].avatar,function (err) {
+                if(!err){
+                    // let fileimg =
+                    DB.deleteOne('user',{'_id':DB.ObjectID(id)},function (err,data) {
+                        if(!err){
+                            res.json({
+                                code:0,
+                                data:"删除成功！"
+                            });
+                        }else{
+                            res.json({
+                                code:1,
+                                data:"删除失败！"
+                            });
+                        }
+                    })
+                }else{
+                    res.json({
+                        code:1,
+                        data:"删除失败！"
+                    });
+                }
+            })
+
+        }else{
+            res.json({
+                code:1,
+                data:"删除失败,查无此人！"
+            });
+        }
+    })
+
+})
+
 
 module.exports = Router;   /*暴露这个 router模块*/
