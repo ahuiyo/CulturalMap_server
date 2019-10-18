@@ -190,6 +190,33 @@ Router.get('/deluser',function (req,res) {
     })
 
 })
+//搜索用户
+Router.get('/search',function (req,res) {
+    let name = req.query.name;
+    DB.find('user',{'username':name},function (err,data) {
+        console.log(data)
+        if(!err){
+            if(data.length > 0){
+                res.json({
+                    code:0,
+                    msg:'搜索成功',
+                    data,
+                })
+            }else{
+                res.json({
+                    code:-1,
+                    msg:'查无此人',
+                })
+            }
+        }else{
+            res.json({
+                code:1,
+                msg:'查询失败',
+            })
+        }
 
+
+    })
+})
 
 module.exports = Router;   /*暴露这个 router模块*/
