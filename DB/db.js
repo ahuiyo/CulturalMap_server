@@ -96,7 +96,7 @@ exports.insert=function (collectionname,json,callback) {
 }
 
 //修改数据
-exports.update=function (collectionname,json1,json2,callback) {
+exports.updateOne=function (collectionname,json1,json2,callback) {
     connectDb(function (db) {
 
         db.collection(collectionname).update(json1,{$set:json2},function (error,data) {

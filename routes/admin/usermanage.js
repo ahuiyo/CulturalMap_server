@@ -100,27 +100,58 @@ Router.post('/edituser',function (req,res) {
         keepExtensions:true  //保留后缀
     });
     form.parse(req, function(err, fields, files) {
-        console.log(fields)
-        console.log(files)
         var id = fields.id[0];
         var username=fields.username[0];
         var gender=fields.gender[0];
         var phone=fields.phone[0];
         var city=fields.city[0];
         var remarks=fields.remarks[0];
-        var avatar=files.avatar[0].path;
-        var originalFilename=files.avatar[0].originalFilename;
+        var avatarstate = fields.avatarstate[0]
         var setdata={};
-        console.log(originalFilename+"----------------")
-        if(originalFilename){
-            setdata={
-                username,
-                gender,
-                phone,
-                city,
-                remarks,
-                avatar,
-            }
+        //修改了图片
+        if(avatarstate == 1) {
+
+            var avatar=files.avatar[0].path;
+            // var originalFilename=files.avatar[0].originalFilename;
+            DB.find('user',{'_id':DB.ObjectID(id)},function (err,data) {
+                if(data[0].avatar !== ''){
+                    fs.unlink('./'+data[0].avatar,(err) => {
+                    if (err) throw err;
+                    console.log('无用图片已删除');
+                    setdata={
+                        username,
+                        gender,
+                        phone,
+                        city,
+                        remarks,
+                        avatar,
+                    }
+                })
+                }else{
+                    setdata={
+                        username,
+                        gender,
+                        phone,
+                        city,
+                        remarks,
+                        avatar,
+                    }
+                }
+                DB.updateOne("user",{'_id':DB.ObjectID(id)},setdata,function (err,data) {
+                    if(!err){
+                        res.json({
+                            code:0,
+                            data:"修改成功！"
+                        });
+                    }else{
+                        console.log(err)
+                        res.json({
+                            code:1,
+                            data:"修改失败！"
+                        });
+                    }
+                })
+            })
 
         }else{
             setdata={
@@ -130,24 +161,23 @@ Router.post('/edituser',function (req,res) {
                 city,
                 remarks,
             }
-            fs.unlink(avatar, (err) => {
-                if (err) throw err;
-                console.log('无用图片已删除');
-            });
+            DB.updateOne("user",{'_id':DB.ObjectID(id)},setdata,function (err,data) {
+                if(!err){
+                    res.json({
+                        code:0,
+                        data:"修改成功！"
+                    });
+                }else{
+                    console.log(err)
+                    res.json({
+                        code:1,
+                        data:"修改失败！"
+                    });
+                }
+            })
         }
-        DB.update("user",{'_id':DB.ObjectID(id)},setdata,function (err,data) {
-            if(!err){
-                res.json({
-                    code:0,
-                    data:"修改成功！"
-                });
-            }else{
-                res.json({
-                    code:1,
-                    data:"修改失败！"
-                });
-            }
-        })
+
+
     });
 })
 
@@ -192,8 +222,9 @@ Router.get('/deluser',function (req,res) {
 })
 //搜索用户
 Router.get('/search',function (req,res) {
-    let name = req.query.name;
-    DB.find('user',{'username':name},function (err,data) {
+    let name =req.query.name;
+    console.log(name)
+    DB.find('user',{'username':{$regex:name}},function (err,data) {
         console.log(data)
         if(!err){
             if(data.length > 0){
