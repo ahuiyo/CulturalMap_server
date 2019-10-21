@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');
 var DB=require('../../DB/db.js');  /*引入DB数据库*/
 // 图片上传模块   也可获取post数据
 var multiparty = require('multiparty');
-
+var ObjectID = require('mongodb').ObjectID;
 
 //引入fs模块
 var fs=require("fs");
@@ -193,7 +193,7 @@ Router.get('/deluser',function (req,res) {
                     DB.deleteOne('user',{'_id':DB.ObjectID(id)},function (err,data) {
                         if(!err){
                             res.json({
-                                code:0,
+                                  code:0,
                                 data:"删除成功！"
                             });
                         }else{
@@ -220,6 +220,31 @@ Router.get('/deluser',function (req,res) {
     })
 
 })
+
+//批量删除用户
+Router.post('/delusers',function (req,res) {
+    var userlist=req.body.list.split(",");
+    console.log(userlist)
+    for(let i =0;i<userlist.length;i++){
+        console.log(userlist[i])
+        var id=JSON.stringify(userlist[i]);
+        console.log("id" + id + "---type" + typeof id)
+        DB.find('user',{'_id':ObjectID(id)},function (err,data) {
+
+                console.log('./'+data[0].avatar);
+                fs.unlink('./'+data[0].avatar,function (err) {
+                    DB.deleteOne('user', {'_id': new ObjectID(id)}, function (err, data) {
+                    })
+                })
+        })
+    }
+
+    res.json({
+        code:0,
+        data:"删除成功！"
+    });
+})
+
 //搜索用户
 Router.get('/search',function (req,res) {
     let name =req.query.name;
