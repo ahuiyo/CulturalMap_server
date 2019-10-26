@@ -221,29 +221,6 @@ Router.get('/deluser',function (req,res) {
 
 })
 
-//批量删除用户
-Router.post('/delusers',function (req,res) {
-    var userlist=req.body.list.split(",");
-    console.log(userlist)
-    for(let i =0;i<userlist.length;i++){
-        console.log(userlist[i])
-        var id=JSON.stringify(userlist[i]);
-        console.log("id" + id + "---type" + typeof id)
-        DB.find('user',{'_id':ObjectID(id)},function (err,data) {
-
-                console.log('./'+data[0].avatar);
-                fs.unlink('./'+data[0].avatar,function (err) {
-                    DB.deleteOne('user', {'_id': new ObjectID(id)}, function (err, data) {
-                    })
-                })
-        })
-    }
-
-    res.json({
-        code:0,
-        data:"删除成功！"
-    });
-})
 
 //搜索用户
 Router.get('/search',function (req,res) {
