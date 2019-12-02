@@ -1,11 +1,11 @@
 //Mongo模块
-var MongoClient=require('mongodb').MongoClient;
+const MongoClient = require('mongodb').MongoClient;
 /*连接数据库*/
-var DbUrl='mongodb://127.0.0.1:27017';
+const DbUrl = 'mongodb://127.0.0.1:27017';
 
-var UrlPath='map';
+const UrlPath = 'map';
 
-var ObjectID = require('mongodb').ObjectID;
+const ObjectID = require('mongodb').ObjectID;
 
 //封装连接数据库的方法
 function connectDb(callback) {
@@ -20,47 +20,39 @@ function connectDb(callback) {
         client.close();/*关闭数据库连接*/
     })
 }
-
-
+// 封装获取数据库总数
+        function totalpage(){
+            return new Promise(function(resolve,reject){
+                let promise = db.collection(collectionname).find().count();
+                promise.then(function (response) {
+                    // 成功了调用resolve()
+                    resolve(response.data)
+                }).catch(function (error) {
+                    //失败了调用reject()
+                    reject(error)
+                })
+            })
+        }
+        var total=totalpage();
+        // async function aa(){
+        //    total = await totalpage();
+        // }
+        // aa();
+        console.log(total+"==========total")
 //查找分页数据库
-exports.findpage=function (collectionname,num,numpage,callback) {
+exports.findpage=function (collectionname,amount,page,callback) {
     connectDb(function (db) {
-
         var totalpage=0;
-
         db.collection(collectionname).find().count(function (err, result) {
             // 对返回值result做你想做的操作
             totalpage= result;
-
-            var database=db.collection(collectionname).find().sort({"_id":1}).limit(num).skip(numpage*num-num);
+            var database=db.collection(collectionname).find().sort({"_id":1}).limit(amount).skip(page*amount-amount);
             console.log(database)
             database.toArray(function (error,data) {
                 console.log(data + "===========data")
                 callback(error,data,totalpage);/*拿到数据执行回调函数*/
             })
         });
-
-
-
-// 封装获取数据库总数
-//         function totalpage(){
-//             return new Promise(function(resolve,reject){
-//                 let promise = db.collection(collectionname).find().count();
-//                 promise.then(function (response) {
-//                     // 成功了调用resolve()
-//                     resolve(response.data)
-//                 }).catch(function (error) {
-//                     //失败了调用reject()
-//                     reject(error)
-//                 })
-//             })
-//         }
-//         var total=0;
-//         async function aa(){
-//            total=await totalpage();
-//         }
-//         aa();
-//         console.log(total+"==========total")
 
     })
 }

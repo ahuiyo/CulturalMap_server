@@ -2,41 +2,41 @@ const express = require('express');
 
 const Router = express.Router();
 
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 
 
-var DB=require('../../DB/db.js');  /*引入DB数据库*/
+const DB = require('../../DB/db.js');  /*引入DB数据库*/
 // 图片上传模块   也可获取post数据
-var multiparty = require('multiparty');
-var ObjectID = require('mongodb').ObjectID;
+const multiparty = require('multiparty');
+const ObjectID = require('mongodb').ObjectID;
 
 //引入fs模块
-var fs=require("fs");
+const fs = require("fs");
 // parse application/x-www-form-urlencoded
 Router.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 Router.use(bodyParser.json());
 
 Router.get('/',function (req,res) {
-    var pagenum;
+    var page;
     if(req.query.page){
-        pagenum=req.query.page;
+        page=req.query.page;
     }else{
-        pagenum=1;
+        page=1;
     }
-    // DB.findpage('user',5,pagenum,function (error,data,total) {
-    //     res.json({
-    //         list:data,
-    //         pagenum,
-    //         total
-    //     })
-    // })
-    DB.find('user',{},function (err,data) {
+    DB.findpage('user',5,page,function (error,data,total) {
         res.json({
-            code:0,
-            data,
+            list:data,
+            page,
+            total
         })
     })
+    // DB.find('user',{},function (err,data) {
+    //     res.json({
+    //         code:0,
+    //         data,
+    //     })
+    // })
 });
 // 增加商品请求
 Router.post('/adduser',function (req,res) {
